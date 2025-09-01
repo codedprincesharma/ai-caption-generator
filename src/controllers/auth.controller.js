@@ -74,5 +74,5 @@ async function loginController(req, res) {
     res.status(500).json({ message: "Internal server error", error });
   }
 }
-//
+
 module.exports = { registerController, loginController };
