@@ -13,30 +13,26 @@ async function registerController(req, res) {
       return res.status(409).json({ message: "User already exists" });
     }
 
-    // hash password
-    const hashPassword = await bcrypt.hash(password, 10);
-
     // create new user
-    const newUser = await userModel.create({
+    const user = await userModel.create({
       username,
-      password: hashPassword,
+      password: await bcrypt.hash(password, 10)
     });
 
     // create token
     const token = jwt.sign(
-      { id: newUser._id },
+      { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
     // set cookie
-    res.cookie("token", token, { httpOnly: true });
-
+    res.cookie("token", token, { expiresIn:"1d" });
     res.status(201).json({
       message: "User registered successfully",
       user: {
-        id: newUser._id,
-        username: newUser.username,
+        id: user._id,
+        username: user.username,
       },
     });
   } catch (error) {
@@ -48,7 +44,6 @@ async function registerController(req, res) {
 async function loginController(req, res) {
   try {
     const { username, password } = req.body;
-
     // find user
     const user = await userModel.findOne({ username });
     if (!user) {
@@ -79,5 +74,5 @@ async function loginController(req, res) {
     res.status(500).json({ message: "Internal server error", error });
   }
 }
-
+//
 module.exports = { registerController, loginController };
