@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken")
 const userModel = require('../models/user.model')
 
-async function authmiddleWare(req, res) {
+async function authmiddleWare(req, res,next) {
   const token = req.cookies.token
   if (!token) {
     return res.status(401).json({
@@ -14,6 +14,7 @@ async function authmiddleWare(req, res) {
       _id: decoded.id
     })
     req.user = user
+    next()
   } catch (error) {
     return res.status(401).json({
       "message": "Invalid token , please login again",
@@ -21,5 +22,4 @@ async function authmiddleWare(req, res) {
     })
   }
 }
-
 module.exports = authmiddleWare
