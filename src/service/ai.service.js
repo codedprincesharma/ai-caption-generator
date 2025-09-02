@@ -1,15 +1,33 @@
-// Import the correct package
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenAI } from "@google/genai";
 
-// API key (environment variable use karna best practice hai)
-const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// The client gets the API key from the environment variable `GEMINI_API_KEY`.
+const ai = new GoogleGenAI({});
 
 async function main() {
-  const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-  const result = await model.generateContent("Explain how AI works in a few words");
-
-  console.log(result.response.text());
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: "Explain how AI works in a few words",
+  });
+  console.log(response.text);
 }
 
 main();
+
+async function generateCaption(base64ImageFile) {
+  const contents = [
+    {
+      inlineData: {
+        mimeType: "image/jpeg",
+        data: base64ImageFile,
+      },
+    },
+    { text: "Caption this image." },
+  ];
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: contents,
+  });
+  return response.text
+}
+
+module.exports = generateCaption
